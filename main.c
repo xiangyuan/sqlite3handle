@@ -8,6 +8,7 @@
 #include "source/sqlithandle.h"
 #include "source/xmemory.h"
 #include "source/sqlite3more.h"
+#include "source/fileop.h"
 
 #define DATABASE_NAME "mytest.db"
 
@@ -43,24 +44,8 @@ extern int query(void* data, int colcount, char **values, char**colnames) {
 }
 
 void file_opr_test() {
-	FILE *file = NULL;
-	file = fopen("test.jpg", "r");
-	if (file == NULL) {
-		printf("file open failure\n");
-		return;
-	}
-	fseek(file, 0, SEEK_END);//移到文件结束
-	long int fsize = ftell(file);
-	printf("file length is %ld\n", fsize);
-	fseek(file, 0, SEEK_SET);
-	int len;
-	char buff[fsize];
-	len = fread(buff, sizeof(char), fsize, file);
-	printf("the len= %d\n", len);
-	printf("the file msg %s\n", buff);
-
-	FILE * newFile = fopen("back.jpg", "w");
-	fprintf(newFile, "%s", buff);
+	char * path = picture_in_byte("test.jpg","back.jpg");
+	printf("the path %s\n",path);
 }
 int main(int argv, char * agrs[]) {
 	file_opr_test();

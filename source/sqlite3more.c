@@ -105,15 +105,11 @@ boolean db_insert_blob(sqlite3 *db, const char *sql, FILE * file, int id) {
 	sqlite3_bind_text(ptmt, 2, "work", -1, SQLITE_TRANSIENT);
 	sqlite3_bind_text(ptmt, 3, "13213123", -1, SQLITE_TRANSIENT);
 	int len;
-	char buff[fsize + 1];
-	len = fread(buff, sizeof(char), fsize + 1, file);
+	char buff[fsize];
+	len = fread(buff, sizeof(char), fsize, file);
+	printf("the file msg %s\n", buff);
 	printf("the len is %d\n", len);
-	//	re = sqlite3_blob_write(mblog, buff, fsize + 1, 0);
-	//	if (re != SQLITE_OK) {
-	//		exit(0);
-	//	}
-	//	int re = sqlite3_bind_zeroblob(ptmt, 4, fsize);
-	int re = sqlite3_bind_blob(ptmt, 4, buff, fsize, NULL);
+	int re = sqlite3_bind_blob(ptmt, 4, buff, fsize, SQLITE_TRANSIENT);
 	if (re != SQLITE_OK) {
 		sqlite3_finalize(ptmt);
 		perror(sqlite3_errmsg(db));
@@ -121,7 +117,7 @@ boolean db_insert_blob(sqlite3 *db, const char *sql, FILE * file, int id) {
 		return (isOk);
 	}
 	re = sqlite3_step(ptmt);
-	if (re != SQLITE_OK && re != SQLITE_DONE) {
+	if (re != SQLITE_DONE) {
 		sqlite3_finalize(ptmt);
 		perror(sqlite3_errmsg(db));
 		fclose(file);
@@ -156,4 +152,34 @@ boolean db_insert_blob(sqlite3 *db, const char *sql, FILE * file, int id) {
 	fclose(file);
 	sqlite3_finalize(ptmt);
 	return (isOk);
+}
+/*
+ *@param db
+ *@param sql
+ *@param id
+ */
+void db_get_blob(sqlite3 *db, const char *table, const char *col, int id) {
+	sqlite3_blob *blob;
+	int re = sqlite3_blob_open(db, NULL, table, col, id, 2, &blob);
+	if (re != SQLITE_OK)
+		return;
+	/*get the size of the blob object*/
+	int fsize = sqlite3_blob_bytes(blob);
+	char buff[fsize];
+	re = sqlite3_blob_read(blob, buff, fsize, 0);
+
+/*now can write the data to file*/
+	printf("the read blob %s\n", buff);
+	FILE * file = fopen("back.jpg","w");
+	fprintf(file,"%s",buff);
+	//now can handle exception,but the code i'm not refactored
+	if (re != SQLITE_OK) {
+		perror(sqlite3_errmsg(db));
+		return;
+	}
+	re = sqlite3_blob_close(blob);
+	if (re != SQLITE_OK) {
+		perror(sqlite3_errmsg(db));
+		return;
+	}
 }

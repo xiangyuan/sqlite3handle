@@ -42,10 +42,31 @@ extern int query(void* data, int colcount, char **values, char**colnames) {
 	return 0;
 }
 
+void file_opr_test() {
+	FILE *file = NULL;
+	file = fopen("test.jpg", "r");
+	if (file == NULL) {
+		printf("file open failure\n");
+		return;
+	}
+	fseek(file, 0, SEEK_END);//移到文件结束
+	long int fsize = ftell(file);
+	printf("file length is %ld\n", fsize);
+	fseek(file, 0, SEEK_SET);
+	int len;
+	char buff[fsize];
+	len = fread(buff, sizeof(char), fsize, file);
+	printf("the len= %d\n", len);
+	printf("the file msg %s\n", buff);
+
+	FILE * newFile = fopen("back.jpg", "w");
+	fprintf(newFile, "%s", buff);
+}
 int main(int argv, char * agrs[]) {
-	db_open(db, DATABASE_NAME, open_callback);
-	printf("the db is null %s\n", db == NULL ? "true" : "false");
-	printf("the db address is %p\n", db);
+	file_opr_test();
+//	db_open(db, DATABASE_NAME, open_callback);
+//	printf("the db is null %s\n", db == NULL ? "true" : "false");
+//	printf("the db address is %p\n", db);
 	//	//create database/
 	//	const char * create_table = "create table userinfo(id integer,"
 	//													"uname text not null,"
@@ -99,18 +120,22 @@ int main(int argv, char * agrs[]) {
 	//得到数据库数据
 	//	db_select_data(db, "select id,uname,pwd,uno,rdate,mblog from userinfo",
 	//			NULL, query);
-	FILE *file = NULL;
-	file = fopen("test.jpg", "r");
-	if (file == NULL) {
-		printf("file open failure\n");
-	}
-	boolean isOk = db_insert_blob(db,"insert into userinfo(id,uname,pwd,mblog) values(?,?,?,?)",file,7);
-	if (isOk) {
-		printf("insert success !\n");
-	} else {
-		printf("insert blog failure \n");
-	}
-	db_close(db);
-	printf("the db address is %p\n", db);
+	/*//插入blob对象
+	 FILE *file = NULL;
+	 file = fopen("test.jpg", "r");
+	 if (file == NULL) {
+	 printf("file open failure\n");
+	 }
+	 boolean isOk = db_insert_blob(db,"insert into userinfo(id,uname,pwd,mblog) values(?,?,?,?)",file,7);
+	 if (isOk) {
+	 printf("insert success !\n");
+	 } else {
+	 printf("insert blog failure \n");
+	 }
+	 */
+
+//	db_get_blob(db, "userinfo", "mblog", 7);
+//	db_close(db);
+//	printf("the db address is %p\n", db);
 	return 0;
 }

@@ -22,5 +22,11 @@ struct Table {
 };
 
 typedef void (*db_open_callback)(sqlite3*);
+/**
+ * handle the exception
+ *@param int
+ *@param char *
+ */
+void throw_sqlite_exception(int,char *);
 
 #endif /* DEFDATATYPES_H_ */

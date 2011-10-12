@@ -45,9 +45,12 @@ boolean db_use_transaction(sqlite3 *db,const char *sql,void **datas,int len,int 
 boolean db_insert_blob(sqlite3 *db,const char *sql,FILE * file,int id);
 /**
  * get the blob
- * @param db
- * @param sql
+ *@param db
+ *@param table
+ *@param col
+ *@param id
+ *@return void
  */
-void db_get_blob(sqlite3 *db,const char sql);
+void db_get_blob(sqlite3 *db,const char *table,const char *col,int id);
 
 #endif /* SQLITE3MORE_H_ */
